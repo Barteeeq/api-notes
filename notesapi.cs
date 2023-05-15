@@ -1,3 +1,4 @@
+# Project named "notesapi" for making notes, editing, deleting, by Bartosz "Barteeq" Skowroński
 using System;
 using System.Collections.Generic;
 using System.Linq;
