@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Notes API</title>
+	<style>
+		body {
+			font-family: 'Helvetica Neue', sans-serif;
+			font-size: 16px;
+			background-color: #f7f7f7;
+			margin: 0;
+			padding: 0;
+		}
+
+		h1, h2 {
+			color: #2c3e50;
+			font-weight: bold;
+			font-size: 48px;
+			text-align: center;
+			margin-bottom: 40px;
+			margin-top: 50px;
+		}
+
+		.form-section {
+			padding: 40px;
+			background-color: #fff;
+			box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+			border-radius: 10px;
+			max-width: 600px;
+			margin: 0 auto;
+			margin-bottom: 50px;
+		}
+z
+		.form-section h2 {
+			color: #2c3e50;
+			font-size: 36px;
+			margin-bottom: 20px;
+			text-align: center;
+			font-weight: bold;
+		}
+
+		form {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		form label {
+			color: #2c3e50;
+			font-weight: bold;
+			margin-bottom: 10px;
+		}
+
+		form input[type=text],
+		form input[type=number],
+		form textarea {
+			width: 100%;
+			padding: 12px;
+			border: none;
+			border-radius: 5px;
+			font-size: 16px;
+			margin-bottom: 20px;
+			color:#555;
+			box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1);
+			background-color: #f7f7f7;
+		}
+
+		form button[type=button] {
+			background-color: #2c3e50;
+			color: #fff;
+			font-size: 16px;
+			font-weight: bold;
+			border: none;
+			border-radius: 5px;
+			padding: 12px 20px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+
+		form button[type=button]:hover {
+			background-color: #1d2731;
+			box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+		}
+
+		.notes-list {
+			padding: 40px;
+			background-color: #fff;
+			box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+			border-radius: 10px;
+			max-width: 600px;
+			margin: 0 auto;
+		}
+
+		.notes-list h2 {
+			color: #2c3e50;
+			font-size: 36px;
+			margin-bottom: 20px;
+			text-align: center;
+			font-weight: bold;
+		}
+
+		.notes-list li {
+			font-size: 16px;
+			padding: 12px;
+			border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+			margin-bottom: 10px;
+			list-style:none;
+			overflow-wrap: break-word;
+		}
+
+		.notes-list li strong {
+			margin-right: 10px;
+		}
+
+	</style>
+</head>
+<body>
+
+	<h1>Notes API</h1>
+
+	<div class="form-section">
+		<h2>Add Note</h2>
+		<form id="add-note">
+			<label for="note-title">Title:</label>
+			<input type="text" id="note-title" name="note-title" required>
+			<label for="note-content">Content:</label>
+			<textarea id="note-content" name="note-content" rows="5" required></textarea>
+			<button type="button" onclick="addNote()">Add Note</button>
+		</form>
+	</div>
+
+	<div class="form-section">
+		<h2>Get Note</h2>
+		<form id="single-note">
+			<label for="note-id">ID:</label>
+			<input type="number" id="note-id" name="note-id">
+			<button type="button" onclick="getNote()">Get Note</button>
+		</form>
+	</div>
+
+	<div class="form-section">
+		<h2>Update Note</h2>
+		<form id="update-note">
+			<label for="update-note-id">ID:</label>
+			<input type="number" id="update-note-id" name="update-note-id">
+			<label for="update-note-title">Title:</label>
+			<input type="text" id="update-note-title" name="update-note-title" required>
+			<label for="update-note-content">Content:</label>
+			<textarea id="update-note-content" name="update-note-content" rows="5" required></textarea>
+			<button type="button" onclick="updateNote()">Update Note</button>
+		</form>
+	</div>
+
+
+	<div class="form-section">
+		<h2>Delete Note</h2>
+		<form id="delete-note">
+			<label for="delete-note-id">ID:</label>
+			<input type="number" id="delete-note-id" name="delete-note-id">
+			<button type="button" onclick="deleteNote()">Delete Note</button>
+		</form>
+	</div>
+
+
+	<div class="notes-list">
+		<h2>All Notes</h2>
+		<ul id="all-notes">
+		</ul>
+	</div>
+
+
+	<script>
+		// Get all notes
+		fetch('/notes')
+			.then(response => response.json())
+			.then(data => {
+				let notesList = document.getElementById('all-notes');
+				data.forEach(note => {
+					let li = document.createElement('li');
+					li.innerHTML = `<strong>${note.title}:</strong> ${note.content}`;
+					notesList.appendChild(li);
+				});
+			})
+			.catch(error => console.error(error));
+
+		// Get single note by id
+		function getNote() {
+			let noteId = document.getElementById('note-id').value;
+			fetch(`/notes/${noteId}`)
+				.then(response => response.json())
+				.then(data => {
+					let note = document.createElement('li');
+					note.innerHTML = `<strong>${data.title}:</strong> ${data.content}`;
+					document.getElementById('all-notes').innerHTML = '';
+					document.getElementById('all-notes').appendChild(note);
+				})
+				.catch(error => console.error(error));
+		}
+
+		// Add note
+		function addNote() {
+			let noteTitle = document.getElementById('note-title').value;
+			let noteContent = document.getElementById('note-content').value;
+			fetch('/notes', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						title: noteTitle,
+						content: noteContent
+					})
+				})
+				.then(response => response.json())
+				.then(data => {
+					let note = document.createElement('li');
+					note.innerHTML = `<strong>${data.title}:</strong> ${data.content}`;
+					document.getElementById('all-notes').appendChild(note);
+				})
+				.catch(error => console.error(error));
+		}
+
+		// Update note
+		function updateNote() {
+			let noteId = document.getElementById('update-note-id').value;
+			let noteTitle = document.getElementById('update-note-title').value;
+			let noteContent = document.getElementById('update-note-content').value;
+			fetch(`/notes/${noteId}`, {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						title: noteTitle,
+						content: noteContent
+					})
+				})
+				.then(response => response.json())
+				.then(data => {
+					let note = document.createElement('li');
+					note.innerHTML = `<strong>${data.title}:</strong> ${data.content}`;
+					document.getElementById('all-notes').innerHTML = '';
+					document.getElementById('all-notes').appendChild(note);
+				})
+				.catch(error => console.error(error));
+		}
+
+		// Delete note
+		function deleteNote() {
+			let noteId = document.getElementById('delete-note-id').value;
+			fetch(`/notes/${noteId}`, {
+					method: 'DELETE'
+				})
+				.then(response => response.json())
+				.then(data => {
+					document.getElementById('all-notes').innerHTML = '';
+					data.forEach(note => {
+						let li = document.createElement('li');
+						li.innerHTML = `<strong>${note.title}:</strong> ${note.content}`;
+						document.getElementById('all-notes').appendChild(li);
+					});
+				})
+				.catch(error => console.error(error));
+		}
+	</script>
+
+</body>
+</html>
