@@ -1,19 +1,58 @@
-# Project named "notesapi" for making notes, editing, deleting, by Bartosz "Barteeq" Skowroński
+// Project named "notesapi" for making notes, editing, deleting, by Bartosz "Barteeq" Skowroński
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 
-namespace NotesAPI.Controllers
+namespace NotesAPI
 {
+    public class Program
+    {
+        private static string connectionString = "Server=localhost;Database=notes;Uid=username;Pwd=password;";
+
+        public static void Main(string[] args)
+        {
+            CreateWebHostBuilder(args).Build().Run();
+        }
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .UseUrls("http://localhost:5000");
+    }
+
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllers();
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+        }
+    }
+
     [ApiController]
     [Route("[controller]")]
     public class NotesController : ControllerBase
     {
-        private readonly string connectionString = "Server=localhost;Database=notes;Uid=username;Pwd=password;";
-
         [HttpGet]
         public IActionResult Get()
         {
@@ -21,7 +60,7 @@ namespace NotesAPI.Controllers
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = new MySqlConnection(Program.connectionString))
                 {
                     connection.Open();
 
@@ -57,7 +96,7 @@ namespace NotesAPI.Controllers
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = new MySqlConnection(Program.connectionString))
                 {
                     connection.Open();
 
@@ -75,7 +114,7 @@ namespace NotesAPI.Controllers
                         }
                         else
                         {
-                            return NotFound();
+                            return NotFound(new { message = "Note not found" });
                         }
                     }
                 }
@@ -91,9 +130,14 @@ namespace NotesAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] Note note)
         {
+            if (string.IsNullOrEmpty(note.Title) || string.IsNullOrEmpty(note.Content))
+            {
+                return BadRequest(new { message = "Title and content are required" });
+            }
+
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = new MySqlConnection(Program.connectionString))
                 {
                     connection.Open();
 
@@ -111,7 +155,7 @@ namespace NotesAPI.Controllers
                     }
                     else
                     {
-                        return BadRequest();
+                        return BadRequest(new { message = "Note not created" });
                     }
                 }
             }
@@ -124,9 +168,14 @@ namespace NotesAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] Note note)
         {
+            if (string.IsNullOrEmpty(note.Title) || string.IsNullOrEmpty(note.Content))
+            {
+                return BadRequest(new { message = "Title and content are required" });
+            }
+
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = new MySqlConnection(Program.connectionString))
                 {
                     connection.Open();
 
@@ -144,7 +193,7 @@ namespace NotesAPI.Controllers
                     }
                     else
                     {
-                        return NotFound();
+                        return NotFound(new { message = "Note not found" });
                     }
                 }
             }
@@ -159,7 +208,7 @@ namespace NotesAPI.Controllers
         {
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlConnection connection = new MySqlConnection(Program.connectionString))
                 {
                     connection.Open();
 
@@ -175,7 +224,7 @@ namespace NotesAPI.Controllers
                     }
                     else
                     {
-                        return NotFound();
+                        return NotFound(new { message = "Note not found" });
                     }
                 }
             }
