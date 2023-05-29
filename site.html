@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -113,6 +114,12 @@ z
 		}
 
 	</style>
+
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Notes API</title>
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -161,6 +168,16 @@ z
 		</form>
 	</div>
 
+	<div class="form-section">
+		<h2>Login</h2>
+		<form id="login-form">
+			<label for="username">Username:</label>
+			<input type="text" id="username" name="username" required>
+			<label for="password">Password:</label>
+			<input type="password" id="password" name="password" required>
+			<button type="button" onclick="login()">Login</button>
+		</form>
+	</div>
 
 	<div class="notes-list">
 		<h2>All Notes</h2>
@@ -169,100 +186,108 @@ z
 	</div>
 
 
-	<script>
-		// Get all notes
-		fetch('/notes')
-			.then(response => response.json())
-			.then(data => {
-				let notesList = document.getElementById('all-notes');
-				data.forEach(note => {
-					let li = document.createElement('li');
-					li.innerHTML = `<strong>${note.title}:</strong> ${note.content}`;
-					notesList.appendChild(li);
-				});
-			})
-			.catch(error => console.error(error));
-
-		// Get single note by id
-		function getNote() {
-			let noteId = document.getElementById('note-id').value;
-			fetch(`/notes/${noteId}`)
-				.then(response => response.json())
-				.then(data => {
-					let note = document.createElement('li');
-					note.innerHTML = `<strong>${data.title}:</strong> ${data.content}`;
-					document.getElementById('all-notes').innerHTML = '';
-					document.getElementById('all-notes').appendChild(note);
-				})
-				.catch(error => console.error(error));
-		}
-
-		// Add note
-		function addNote() {
-			let noteTitle = document.getElementById('note-title').value;
-			let noteContent = document.getElementById('note-content').value;
-			fetch('/notes', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({
-						title: noteTitle,
-						content: noteContent
-					})
-				})
-				.then(response => response.json())
-				.then(data => {
-					let note = document.createElement('li');
-					note.innerHTML = `<strong>${data.title}:</strong> ${data.content}`;
-					document.getElementById('all-notes').appendChild(note);
-				})
-				.catch(error => console.error(error));
-		}
-
-		// Update note
-		function updateNote() {
-			let noteId = document.getElementById('update-note-id').value;
-			let noteTitle = document.getElementById('update-note-title').value;
-			let noteContent = document.getElementById('update-note-content').value;
-			fetch(`/notes/${noteId}`, {
-					method: 'PATCH',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({
-						title: noteTitle,
-						content: noteContent
-					})
-				})
-				.then(response => response.json())
-				.then(data => {
-					let note = document.createElement('li');
-					note.innerHTML = `<strong>${data.title}:</strong> ${data.content}`;
-					document.getElementById('all-notes').innerHTML = '';
-					document.getElementById('all-notes').appendChild(note);
-				})
-				.catch(error => console.error(error));
-		}
-
-		// Delete note
-		function deleteNote() {
-			let noteId = document.getElementById('delete-note-id').value;
-			fetch(`/notes/${noteId}`, {
-					method: 'DELETE'
-				})
-				.then(response => response.json())
-				.then(data => {
-					document.getElementById('all-notes').innerHTML = '';
-					data.forEach(note => {
-						let li = document.createElement('li');
-						li.innerHTML = `<strong>${note.title}:</strong> ${note.content}`;
-						document.getElementById('all-notes').appendChild(li);
-					});
-				})
-				.catch(error => console.error(error));
-		}
-	</script>
+	<script src="script.js"></script>
 
 </body>
 </html>
+<script>
+	// Get all notes
+	fetch('/notes')
+		.then(response => response.json())
+		.then(data => {
+			let notesList = document.getElementById('all-notes');
+			data.forEach(note => {
+				let li = document.createElement('li');
+				li.innerHTML = `<strong>${note.title}:</strong> ${note.content}`;
+				notesList.appendChild(li);
+			});
+		})
+		.catch(error => console.error(error));
+
+	// Get single note by id
+	function getNote() {
+		let noteId = document.getElementById('note-id').value;
+		fetch(`/notes/${noteId}`)
+			.then(response => response.json())
+			.then(data => {
+				let note = document.createElement('li');
+				note.innerHTML = `<strong>${data.title}:</strong> ${data.content}`;
+				document.getElementById('all-notes').innerHTML = '';
+				document.getElementById('all-notes').appendChild(note);
+			})
+			.catch(error => console.error(error));
+	}
+
+	// Add note
+	function addNote() {
+		let noteTitle = document.getElementById('note-title').value;
+		let noteContent = document.getElementById('note-content').value;
+		fetch('/notes', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					title: noteTitle,
+					content: noteContent
+				})
+			})
+			.then(response => response.json())
+			.then(data => {
+				let note = document.createElement('li');
+				note.innerHTML = `<strong>${data.title}:</strong> ${data.content}`;
+				document.getElementById('all-notes').appendChild(note);
+			})
+			.catch(error => console.error(error));
+	}
+
+	// Update note
+	function updateNote() {
+		let noteId = document.getElementById('update-note-id').value;
+		let noteTitle = document.getElementById('update-note-title').value;
+		let noteContent = document.getElementById('update-note-content').value;
+		fetch(`/notes/${noteId}`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					title: noteTitle,
+					content: noteContent
+				})
+			})
+			.then(response => response.json())
+			.then(data => {
+				let note = document.createElement('li');
+				note.innerHTML = `<strong>${data.title}:</strong> ${data.content}`;
+				document.getElementById('all-notes').innerHTML = '';
+				document.getElementById('all-notes').appendChild(note);
+			})
+			.catch(error => console.error(error));
+	}
+
+	// Delete note
+	function deleteNote() {
+		let noteId = document.getElementById('delete-note-id').value;
+		fetch(`/notes/${noteId}`, {
+				method: 'DELETE'
+			})
+			.then(response => response.json())
+			.then(data => {
+				document.getElementById('all-notes').innerHTML = '';
+				data.forEach(note => {
+					let li = document.createElement('li');
+					li.innerHTML = `<strong>${note.title}:</strong> ${note.content}`;
+					document.getElementById('all-notes').appendChild(li);
+				});
+			})
+			.catch(error => console.error(error));
+	}
+	<div class="notes-list">
+		<h2>All Notes</h2>
+		<ul id="all-notes">
+		</ul>
+	</div>
+</script>
+
+</body>
