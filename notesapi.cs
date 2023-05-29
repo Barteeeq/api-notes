@@ -32,14 +32,14 @@ namespace NotesAPI
         {
             services.AddControllers();
         }
-
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
